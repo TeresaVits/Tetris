@@ -1,0 +1,63 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    text-decoration: none;
+}
+
+html, body {
+    min-height: 100%;
+}
+
+body {
+    overflow: hidden; /* Hide scrollbars */
+    background-color: black;
+}
+
+#tetris {
+    color: white;
+}
+
+#particles-js{
+    width: 100%;
+    height: 100%;
+    color: aliceblue;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+  }
+  
+  h1{
+    text-align: center;
+    vertical-align: auto;
+    background: rgba( 255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+canvas {
+    margin: auto;
+    
+}
+a{
+    text-decoration: none;
+    color: rgb(59, 136, 136);
+}
+.flex{
+    display: flex;
+    margin-top: 100px;
+    margin-left: 750px;
+    border: 500cm;
+}
+div{
+    margin: 20px;
+    margin-left: 10PX;
+}
+ul,li,body {
+    font-style: none;
+    list-style: none;
+}
+button {
+    margin-left: 930px;
+}

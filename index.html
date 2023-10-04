@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tetris</title>
+</head>
+<body>
+    <h1>Tetris</h1>
+    <button id="iniciar" onclick="redirect()">Iniciar</button>
+</body>
+
+<script>
+	var effect = new Audio('effects/background_theme1.mp3');
+	effect.loop = true;
+	effect.play();
+
+    function redirect()
+    {
+        effect.pause();
+
+        effect = new Audio('effects/level_pass.mp3');
+        effect.loop = false;
+        effect.play();
+
+        setTimeout(function() {
+            window.location.href = "tetrisUp.html";
+        }, 2000)
+    }
+
+</script>
+</html>

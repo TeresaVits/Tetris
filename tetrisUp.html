@@ -1,0 +1,589 @@
+<link rel="stylesheet" href="css/style.css">
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>tetris</title>
+</head>
+<body>
+
+	<section class="flex">
+		<div>
+			<canvas class="tetris" id="tela" width="300" height="660" style="border:10px solid #d69fd2;" >2</canvas>
+		</div>
+		<div>
+			<nav>
+					<li><canvas id="rank" width="200" height="300" style="border:10px solid #d69fd2;"></canvas></li>
+					<li><canvas id="pontos" width="200" height="245" style="border:10px solid #d69fd2;"></canvas></li>
+		</div>		
+				</ul>
+			</nav>
+
+	<div id="tetris" style="text-align: center; padding-top: 50px;">
+		<canvas id="tela" width="300" height="660"></canvas>
+		<h1 id="perdeu"></h1>
+	</div>	
+	<div id="particles-js"></div>
+
+	<script src="js/particles.js"></script>
+	<script src="js/app.js"></script>
+</body>
+</html>
+
+<script>
+
+const I = [
+	[
+		[0, 0, 0, 0],
+		[1, 1, 1, 1],
+		[0, 0, 0, 0],
+		[0, 0, 0, 0],
+	],
+	[
+		[0, 0, 1, 0],
+		[0, 0, 1, 0],
+		[0, 0, 1, 0],
+		[0, 0, 1, 0],
+	],
+	[
+		[0, 0, 0, 0],
+		[0, 0, 0, 0],
+		[1, 1, 1, 1],
+		[0, 0, 0, 0],
+	],
+	[
+		[0, 1, 0, 0],
+		[0, 1, 0, 0],
+		[0, 1, 0, 0],
+		[0, 1, 0, 0],
+	]
+];
+
+const J = [
+	[
+		[1, 0, 0],
+		[1, 1, 1],
+		[0, 0, 0]
+	],
+	[
+		[0, 1, 1],
+		[0, 1, 0],
+		[0, 1, 0]
+	],
+	[
+		[0, 0, 0],
+		[1, 1, 1],
+		[0, 0, 1]
+	],
+	[
+		[0, 1, 0],
+		[0, 1, 0],
+		[1, 1, 0]
+	]
+];
+
+const L = [
+	[
+		[0, 0, 1],
+		[1, 1, 1],
+		[0, 0, 0]
+	],
+	[
+		[0, 1, 0],
+		[0, 1, 0],
+		[0, 1, 1]
+	],
+	[
+		[0, 0, 0],
+		[1, 1, 1],
+		[1, 0, 0]
+	],
+	[
+		[1, 1, 0],
+		[0, 1, 0],
+		[0, 1, 0]
+	]
+];
+
+const O = [
+	[
+		[0, 0, 0, 0],
+		[0, 1, 1, 0],
+		[0, 1, 1, 0],
+		[0, 0, 0, 0],
+	]
+];
+
+const S = [
+	[
+		[0, 1, 1],
+		[1, 1, 0],
+		[0, 0, 0]
+	],
+	[
+		[0, 1, 0],
+		[0, 1, 1],
+		[0, 0, 1]
+	],
+	[
+		[0, 0, 0],
+		[0, 1, 1],
+		[1, 1, 0]
+	],
+	[
+		[1, 0, 0],
+		[1, 1, 0],
+		[0, 1, 0]
+	]
+];
+
+const T = [
+	[
+		[0, 1, 0],
+		[1, 1, 1],
+		[0, 0, 0]
+	],
+	[
+		[0, 1, 0],
+		[0, 1, 1],
+		[0, 1, 0]
+	],
+	[
+		[0, 0, 0],
+		[1, 1, 1],
+		[0, 1, 0]
+	],
+	[
+		[0, 1, 0],
+		[1, 1, 0],
+		[0, 1, 0]
+	]
+];
+
+const Z = [
+	[
+		[1, 1, 0],
+		[0, 1, 1],
+		[0, 0, 0]
+	],
+	[
+		[0, 0, 1],
+		[0, 1, 1],
+		[0, 1, 0]
+	],
+	[
+		[0, 0, 0],
+		[1, 1, 0],
+		[0, 1, 1]
+	],
+	[
+		[0, 1, 0],
+		[1, 1, 0],
+		[1, 0, 0]
+	]
+];
+
+const PECAS = [
+//TERESA-->https://www.homehost.com.br/blog/tutoriais/tabela-de-cores-html/
+    [Z, "#6A5ACD"],
+    [S, "#00CED1"],
+    [T, "#00FF7F"],
+    [O, "#00FF00"],
+    [L, "#ADFF2F"],
+    [I, "#8A2BE2"],
+    [J, "#FF69B4"]
+];
+
+const LINHA = 22;
+const COLUNA = 10;
+const TAMANHO = 30;
+const VAGO = "#FFB6C1";
+
+var rank = document.getElementById("rank");
+var c1 = rank.getContext("2d");
+var pontos2 = document.getElementById("pontos");
+var c2 = pontos2.getContext("2d");
+
+var nivel = 1
+
+var peca;
+var tabuleiro = [];
+
+var linhas = 0;
+
+var pontos = 9;
+
+var inicioDescida;
+var fimDeJogo = false;
+
+var tela = document.getElementById("tela");
+var c = tela.getContext("2d");
+
+onkeydown = controlarPeca;
+
+playEffect('effects/ost_test.mp3', true);
+
+iniciarTabuleiro();
+
+desenharTabuleiro();
+
+gerarPeca();
+
+renderText2(nivel, 60, 100);
+
+inicioDescida = Date.now();
+
+descerPeca();
+
+function iniciarTabuleiro() {
+	for (var i = 0; i < LINHA; i++) {
+		tabuleiro[i] = [];
+		
+		for (var j = 0; j < COLUNA; j++) {
+			tabuleiro[i][j] = VAGO;
+		}
+	}
+}
+
+function desenharTabuleiro(){
+    for (var i = 0; i < LINHA; i++) {
+        for (var j = 0; j < COLUNA; j++) {
+            desenharQuadrado(j, i, tabuleiro[i][j]);
+        }
+    }
+}
+
+function desenharQuadrado(x, y, cor){
+    c.fillStyle = cor;
+    c.fillRect(x*TAMANHO, y*TAMANHO, TAMANHO, TAMANHO);
+
+    c.strokeStyle = "#00FA9A";
+    c.strokeRect(x*TAMANHO, y*TAMANHO, TAMANHO, TAMANHO);
+}
+
+function gerarPeca(){
+    var r = Math.floor(Math.random() * PECAS.length);
+	
+	peca = {
+		tetramino : PECAS[r][0],
+		cor : PECAS[r][1],
+		tetraminoN : 0,
+		tetraminoAtivo : [[]],
+		x : 3,
+		y : -2
+	};
+	
+	peca.tetraminoAtivo = peca.tetramino[peca.tetraminoN];
+}
+
+function descerPeca(){
+    var agora = Date.now();
+    var delta = agora - inicioDescida;
+	
+    if (delta > (150 - (12 * nivel) ) ) {
+        moverAbaixo();
+        inicioDescida = Date.now();
+    }
+	
+    if (!fimDeJogo) {
+        requestAnimationFrame(descerPeca);
+    }
+}
+
+function moverAbaixo(){
+    if (!colisao(0, 1, peca.tetraminoAtivo)) {
+        apagarPeca();
+        peca.y++;
+        desenharPeca();
+    } else {
+        travarPeca();
+        gerarPeca();
+    }
+    
+}
+
+function moverDireita(){
+    if (!colisao(1, 0, peca.tetraminoAtivo)) {
+        apagarPeca();
+        peca.x++;
+        desenharPeca();
+    }
+}
+
+function moverEsquerda(){
+    if (!colisao(-1, 0, peca.tetraminoAtivo)) {
+        apagarPeca();
+        peca.x--;
+        desenharPeca();
+    }
+}
+
+function colisao(x, y, p){
+    for (var i = 0; i < p.length; i++) {
+        for (var j = 0; j < p.length; j++) {
+            if (!p[i][j]) {
+                continue;
+            }
+			
+            var novoX = peca.x + j + x;
+            var novoY = peca.y + i + y;
+			
+            if (novoX < 0 || novoX >= COLUNA || novoY >= LINHA) {
+                return true;
+            }
+			
+            if (novoY < 0) {
+                continue;
+            }
+			
+            if (tabuleiro[novoY][novoX] != VAGO) {
+                return true;
+            }
+        }
+    }
+	
+    return false;
+}
+
+function apagarPeca(){
+    preencherPeca(VAGO);
+}
+
+function desenharPeca(){
+    preencherPeca(peca.cor);
+}
+
+function preencherPeca(cor) {
+    for (var i = 0; i < peca.tetraminoAtivo.length; i++) {
+        for (var j = 0; j < peca.tetraminoAtivo.length; j++) {
+            if (peca.tetraminoAtivo[i][j]) {
+                desenharQuadrado(peca.x + j, peca.y + i, cor);
+            }
+        }
+    }
+}
+
+function travarPeca(){
+    for (var i = 0; i < peca.tetraminoAtivo.length; i++) {
+        for (var j = 0; j < peca.tetraminoAtivo.length; j++) {
+            if (!peca.tetraminoAtivo[i][j]) {
+                continue;
+            }
+
+            if (peca.y + i < 0) {
+                
+                fimDeJogo = true;
+
+				//Renato--> redirecionar para pagina gameover
+				window.location.href = "gameover.html";
+				
+                break;
+            }
+
+            tabuleiro[peca.y+i][peca.x+j] = peca.cor;
+        }
+    }
+
+    for (var i = 0; i < LINHA; i++) {
+        var linhaCheia = true;
+		
+        for (var j = 0; j < COLUNA; j++) {
+            linhaCheia = linhaCheia && (tabuleiro[i][j] != VAGO);
+        }
+		
+        if (linhaCheia) {
+
+		playEffect('effects/impact_effect.mp3', false);
+
+		changeBackgroundColor(hexToRgb(peca.cor), 0);
+
+		speedUpParticles(20);
+
+		linhas++;
+
+		pontos = (100 * nivel) + pontos;
+
+		console.log("linha completa " + pontos);
+
+		renderText(pontos, 60, 100);
+
+        for (var y = i; y > 1; y--) {
+            for (var j = 0; j < COLUNA; j++) {
+                tabuleiro[y][j] = tabuleiro[y-1][j];
+            }
+        }
+			
+        for (var j = 0; j < COLUNA; j++) {
+            tabuleiro[0][j] = VAGO;
+        	}
+    	}
+    }
+
+
+	if(linhas >= 10)
+		{
+			nivel++;
+			linhas = linhas - 10;
+			updateText2(nivel, 60, 100);
+			playEffect('level_pass.mp3', false);
+		}
+
+	
+    desenharTabuleiro();
+}
+
+function rodarPeca(){
+    var proximoPadrao = peca.tetramino[(peca.tetraminoN + 1) % peca.tetramino.length];
+    var recuo = 0;
+    
+    if (colisao(0, 0, proximoPadrao)) {
+        if (peca.x > COLUNA/2) {
+            recuo = -1;
+        } else {
+            recuo = 1;
+        }
+    }
+    
+    if (!colisao(recuo, 0, proximoPadrao)) {
+        apagarPeca();
+        peca.x += recuo;
+        peca.tetraminoN = (peca.tetraminoN + 1) % peca.tetramino.length;
+        peca.tetraminoAtivo = peca.tetramino[peca.tetraminoN];
+        desenharPeca();
+    }
+}
+
+function controlarPeca(evento){
+	var tecla = evento.keyCode;
+	
+    if (tecla == 37) {
+
+        moverEsquerda();
+		playEffect('effects/key_side.mp3', false);
+        inicioDescida = Date.now();
+    } else if (tecla == 38) {
+        rodarPeca();
+		playEffect('effects/key_rotate.mp3', false);
+        inicioDescida = Date.now();
+    } else if (tecla == 39
+	) {
+        moverDireita();
+		playEffect('effects/key_side.mp3', false);
+        inicioDescida = Date.now();
+    } else if (tecla == 40) {
+        moverAbaixo();
+		pontos++
+		renderText(pontos, 60, 100);
+		playEffect('effects/key_down.mp3', false);
+
+	
+    } else if (tecla == 32) {
+		moverAbaixo();
+		pontos++
+	}
+}
+
+
+
+function insertionSort(arr)
+{
+	for(var j = 1; j < 7; j++)
+	{
+		var i = j - 1;
+		var key = arr[j];
+
+		while(i >= 0 && arr[i] > key)
+		{
+			arr[i + 1] = arr[i];
+			i = i - 1;
+		}
+		arr[i + 1] = key;
+	}
+}
+
+
+function renderText(content, x, y)
+{
+	c1.clearRect(20, 20, 200, 200);
+	c1.font = '80px Sans-serif';
+    c1.strokeStyle = 'white';
+    c1.lineWidth = 1;
+    c1.strokeText(content, x, y);
+}
+
+function renderText2(content, x, y)
+{
+	c2.clearRect(20, 20, 200, 200);
+	c2.font = '80px Sans-serif';
+    c2.strokeStyle = 'white';
+    c2.lineWidth = 1;
+    c2.strokeText(content, x, y);
+}
+
+
+function playEffect(pathToEffect, isLoop)
+{
+	var effect = new Audio(pathToEffect);
+	effect.loop = isLoop;
+	effect.play();
+
+	console.log(pathToEffect)
+}
+
+
+function hexToRgb(hex)
+{
+	var hexValues = [];
+
+	var result = [];
+
+	[1,3,5].map(function(o) {hexValues.push( hex.slice(o,o+2))})
+
+	for(var i = 0; i < 3; i++)
+	{
+		var convertedHex = parseInt(hexValues[i], 16);
+		result.push(convertedHex);
+	}
+
+	return result;
+}
+
+
+
+function changeBackgroundColor(rgbi, i) {
+
+	if (i > 255) return;
+	
+		var rgb = "rgb(" + (rgbi[0] - i ) + "," + (rgbi[1] - i) + "," + (rgbi[2] - i) + ")";
+		document.body.style.background = rgb;
+
+	setTimeout(function () {
+		changeBackgroundColor(rgbi, i = i + 1);
+	},10);
+}
+
+
+
+function speedUpParticles(startSpeed)
+{
+  if(startSpeed < 1)
+  {
+    return;
+  }
+
+  window.pJSDom[0].pJS.particles.move.speed = startSpeed;
+
+  setTimeout(function()
+  {
+    speedUpParticles(startSpeed = startSpeed - 1);
+  }, 200);
+}
+
+</script>
+
+
+
+
